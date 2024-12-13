@@ -186,8 +186,10 @@
         let loopMode = 'all'; // 'all', 'one', 'none'
 
         window.addEventListener('message', function(event) {
+            console.log('Received message:', event.data);  // 调试日志
+            
             if (event.data.type === 'ADD_AUDIO') {
-                console.log('Received audio:', event.data);
+                console.log('Adding audio:', event.data.url, event.data.title);
                 addToPlaylist(event.data.url, event.data.title);
             }
         });
@@ -362,33 +364,21 @@
             }
         }
 
-        window.onload = function() {
-            // 添加第一个音频
-            addToPlaylist(
-                "https://static.esdict.cn/UserMediaPool/7da880bb-af3e-49e7-ae24-c36eb52dc6de/data/ff3bf82b-3451-4207-aa5a-860dad988309.mp3?stamp=1732630899195",
-                "S01E001 Sloppy Joe Day",
-                "Episode 1"
-            );
+        // 添加从服务器获取播放列表的功能
+        async function getPlaylistFromServer() {
+            try {
+                const response = await fetch('http://localhost:3000/playlist');
+                const playlist = await response.json();
+                playlist.forEach(item => {
+                    addToPlaylist(item.url, item.title);
+                });
+            } catch (error) {
+                console.error('Error fetching playlist:', error);
+            }
+        }
 
-            // 添加第二个音频
-            addToPlaylist(
-                "https://static.eudic.net/UserMediaPool/6a3bbfa9-8fcc-498e-ad56-5758fe3eea1e/data/b9cde858-ff36-4986-94dd-2aaa1ff7cf85.mp3?stamp=1732631635062",
-                "S01E002 Roxy's Secret",
-                "Episode 2"
-            );
-
-            // 添加��三个音频
-            addToPlaylist(
-                "https://static.eudic.net/UserMediaPool/7baef957-ca06-4a50-8449-8345129249de/data/d9e206b7-4575-495f-95f1-e6e68cd9d119.mp3?stamp=1733226250415",
-                "Audio 3",
-                "Unknown"
-            );
-
-            // 初始化循环模式按钮
-            const loopBtn = document.getElementById('loop-btn');
-            loopBtn.textContent = '列表循环';
-            loopBtn.className = 'btn loop-all';
-        };
+        // 页面加载时获取播放列表
+        window.addEventListener('load', getPlaylistFromServer);
     </script>
 </body>
 </html> 
