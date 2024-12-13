@@ -10,75 +10,59 @@
             font-size: 14px;
             color: #37352f;
         }
-        .status {
+        #status {
             padding: 8px;
             border-radius: 4px;
             background: #f1f1f0;
             margin-bottom: 10px;
         }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #2eaadc;
+            color: white;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #2196f3;
+        }
     </style>
 </head>
 <body>
-    <div class="status">控制器已加载</div>
+    <div id="status">控制器已加载</div>
+    <button onclick="injectScript()">启用播放控制</button>
+    
     <script>
-        // 主要控制逻辑
-        function initController() {
-            // 获取父窗口中的所有 MP3 链接
-            const parentWindow = window.parent;
-            
-            // 监听父窗口点击事件
-            parentWindow.document.addEventListener('click', function(e) {
-                // 查找最近的文件容器
-                const fileContainer = e.target.closest('[data-block-type="file"]');
-                if (fileContainer) {
-                    // 查找 MP3 链接
-                    const mp3Link = fileContainer.querySelector('a[href*=".mp3"]');
-                    if (mp3Link) {
+        function injectScript() {
+            const script = `
+                document.querySelectorAll('a[href*=".mp3"]').forEach(link => {
+                    link.addEventListener('click', function(e) {
                         e.preventDefault();
-                        e.stopPropagation();
-                        
-                        // 获取播放器 iframe
-                        const playerFrame = parentWindow.document.querySelector('iframe[src*="13594350363.github.io"]');
+                        const playerFrame = document.querySelector('iframe[src*="13594350363.github.io/notion-music-player/index.html"]');
                         if (playerFrame) {
-                            // 获取文件名
-                            const fileName = mp3Link.getAttribute('download') || mp3Link.href.split('/').pop();
-                            
-                            // 发送到播放器
+                            const fileName = this.getAttribute('download') || this.href.split('/').pop();
                             playerFrame.contentWindow.postMessage({
                                 type: 'ADD_AUDIO',
-                                url: mp3Link.href,
+                                url: this.href,
                                 title: decodeURIComponent(fileName)
                             }, '*');
-
-                            // 更新状态显示
-                            document.querySelector('.status').textContent = '已添加: ' + fileName;
                         }
-                    }
-                }
-            });
-
-            // 添加文件悬停效果
-            const style = parentWindow.document.createElement('style');
-            style.textContent = `
-                [data-block-type="file"] {
-                    cursor: pointer !important;
-                }
-                [data-block-type="file"]:hover {
-                    background: rgba(55, 53, 47, 0.08) !important;
-                }
+                    });
+                });
             `;
-            parentWindow.document.head.appendChild(style);
-        }
 
-        // 等待父窗口加载完成
-        if (window.parent) {
-            try {
-                initController();
-                console.log('Controller initialized');
-            } catch (e) {
-                console.error('Controller initialization failed:', e);
-                document.querySelector('.status').textContent = '控制器初始化失败: ' + e.message;
-            }
+            // 创建一个 bookmarklet 风格的链接
+            const bookmarklet = document.createElement('a');
+            bookmarklet.href = 'javascript:' + encodeURIComponent(`(function(){${script}})();`);
+            bookmarklet.textContent = '点击这里启用播放控制';
+            bookmarklet.style.display = 'block';
+            bookmarklet.style.marginTop = '10px';
+            bookmarklet.style.color = '#2196f3';
+            
+            document.body.appendChild(bookmarklet);
+            document.getElementById('status').textContent = '请将上面的链接拖到书签栏，然后在 Notion 页面点击该书签';
         }
     </script>
 </body>
