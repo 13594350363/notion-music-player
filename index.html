@@ -187,7 +187,8 @@
 
         window.addEventListener('message', function(event) {
             if (event.data.type === 'ADD_AUDIO') {
-                addToPlaylist(event.data.url, event.data.title, event.data.artist);
+                console.log('Received audio:', event.data);
+                addToPlaylist(event.data.url, event.data.title);
             }
         });
 
@@ -376,7 +377,7 @@
                 "Episode 2"
             );
 
-            // 添加第三个音频
+            // 添加��三个音频
             addToPlaylist(
                 "https://static.eudic.net/UserMediaPool/7baef957-ca06-4a50-8449-8345129249de/data/d9e206b7-4575-495f-95f1-e6e68cd9d119.mp3?stamp=1733226250415",
                 "Audio 3",
