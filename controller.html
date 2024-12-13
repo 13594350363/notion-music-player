@@ -10,60 +10,56 @@
             font-size: 14px;
             color: #37352f;
         }
-        #status {
+        .status {
             padding: 8px;
             border-radius: 4px;
             background: #f1f1f0;
             margin-bottom: 10px;
         }
-        button {
+        .bookmarklet {
+            display: inline-block;
             padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
             background: #2eaadc;
             color: white;
-            cursor: pointer;
-            margin: 5px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
         }
-        button:hover {
-            background: #2196f3;
+        .instructions {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f7f6f3;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-    <div id="status">控制器已加载</div>
-    <button onclick="injectScript()">启用播放控制</button>
+    <div class="status">控制器已加载</div>
+    <a href="javascript:(function(){
+        const mp3Links = document.querySelectorAll('a[href*=\'.mp3\']');
+        mp3Links.forEach(link => {
+            link.onclick = function(e) {
+                e.preventDefault();
+                const playerFrame = document.querySelector('iframe[src*=\'13594350363.github.io/notion-music-player\']');
+                if (playerFrame) {
+                    playerFrame.contentWindow.postMessage({
+                        type: 'ADD_AUDIO',
+                        url: this.href,
+                        title: this.textContent || this.href.split('/').pop()
+                    }, '*');
+                }
+            };
+        });
+        alert('播放控制已启用！');
+    })()" class="bookmarklet">点击启用播放控制</a>
     
-    <script>
-        function injectScript() {
-            const script = `
-                document.querySelectorAll('a[href*=".mp3"]').forEach(link => {
-                    link.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const playerFrame = document.querySelector('iframe[src*="13594350363.github.io/notion-music-player/index.html"]');
-                        if (playerFrame) {
-                            const fileName = this.getAttribute('download') || this.href.split('/').pop();
-                            playerFrame.contentWindow.postMessage({
-                                type: 'ADD_AUDIO',
-                                url: this.href,
-                                title: decodeURIComponent(fileName)
-                            }, '*');
-                        }
-                    });
-                });
-            `;
-
-            // 创建一个 bookmarklet 风格的链接
-            const bookmarklet = document.createElement('a');
-            bookmarklet.href = 'javascript:' + encodeURIComponent(`(function(){${script}})();`);
-            bookmarklet.textContent = '点击这里启用播放控制';
-            bookmarklet.style.display = 'block';
-            bookmarklet.style.marginTop = '10px';
-            bookmarklet.style.color = '#2196f3';
-            
-            document.body.appendChild(bookmarklet);
-            document.getElementById('status').textContent = '请将上面的链接拖到书签栏，然后在 Notion 页面点击该书签';
-        }
-    </script>
+    <div class="instructions">
+        <p>使用说明：</p>
+        <ol>
+            <li>将上面的按钮拖到书签栏</li>
+            <li>在 Notion 页面点击该书签</li>
+            <li>然后点击 MP3 文件即可添加到播放列表</li>
+        </ol>
+    </div>
 </body>
 </html>
