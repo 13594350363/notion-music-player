@@ -36,21 +36,42 @@
 <body>
     <div class="status">控制器已加载</div>
     <a href="javascript:(function(){
-        const mp3Links = document.querySelectorAll('a[href*=\'.mp3\']');
-        mp3Links.forEach(link => {
-            link.onclick = function(e) {
+        function handleClick(e) {
+            const link = e.target.closest('a[href*=\'.mp3\']');
+            if (link) {
                 e.preventDefault();
+                e.stopPropagation();
+                
                 const playerFrame = document.querySelector('iframe[src*=\'13594350363.github.io/notion-music-player\']');
                 if (playerFrame) {
+                    const fileName = link.getAttribute('download') || link.href.split('/').pop();
                     playerFrame.contentWindow.postMessage({
                         type: 'ADD_AUDIO',
-                        url: this.href,
-                        title: this.textContent || this.href.split('/').pop()
+                        url: link.href,
+                        title: decodeURIComponent(fileName)
                     }, '*');
+                    console.log('Sending to player:', link.href);
                 }
-            };
-        });
-        alert('播放控制已启用！');
+                return false;
+            }
+        }
+
+        document.removeEventListener('click', handleClick, true);
+        
+        document.addEventListener('click', handleClick, true);
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            a[href*='.mp3'] {
+                cursor: pointer !important;
+            }
+            a[href*='.mp3']:hover {
+                opacity: 0.8;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        alert('播放控制已启用！点击 MP3 文件将直接添加到播放列表。');
     })()" class="bookmarklet">点击启用播放控制</a>
     
     <div class="instructions">
