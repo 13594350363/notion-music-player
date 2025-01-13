@@ -367,7 +367,7 @@
         // 添加从服务器获取播放列表的功能
         async function getPlaylistFromServer() {
             try {
-                const response = await fetch('http://localhost:3000/playlist');
+                const response = await fetch('http://192.168.3.237:3000/playlist');
                 const playlist = await response.json();
                 playlist.forEach(item => {
                     addToPlaylist(item.url, item.title);

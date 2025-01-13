@@ -1,0 +1,17 @@
+{
+  "name": "notion_api_batch_update",
+  "version": "1.0.0",
+  "main": "integration.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@notionhq/client": "^x.x.x",
+    "dotenv": "^x.x.x",
+    "express": "^4.21.2"
+  }
+}
